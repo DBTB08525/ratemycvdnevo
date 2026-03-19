@@ -57,6 +57,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        score: {
+          low: "hsl(var(--score-low))",
+          mid: "hsl(var(--score-mid))",
+          high: "hsl(var(--score-high))",
+        },
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "sans-serif"],
+        body: ["var(--font-body)", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
