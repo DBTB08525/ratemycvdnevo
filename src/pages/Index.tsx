@@ -5,11 +5,27 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-interface AnalysisResult {
-  ai_score: number;
+interface CategoryScore {
+  name: string;
+  score: number;
   summary: string;
-  reasons: string[];
-  fixes: string[];
+  strengths: string[];
+  improvements: string[];
+}
+
+interface RewriteExample {
+  weak: string;
+  better: string;
+}
+
+interface AnalysisResult {
+  overallScore: number;
+  verdict: string;
+  categoryScores: CategoryScore[];
+  topStrengths: string[];
+  mainIssues: string[];
+  quickWins: string[];
+  rewriteExamples: RewriteExample[];
 }
 
 type Screen = "upload" | "loading" | "results";
@@ -43,7 +59,7 @@ const Index = () => {
       toast({
         title: "Analysis failed",
         description:
-          e?.message || "We couldn't read that file. Please try a different PDF or Word doc.",
+          e?.message || "Something went wrong while reviewing your CV. Please try again.",
         variant: "destructive",
       });
       setScreen("upload");
