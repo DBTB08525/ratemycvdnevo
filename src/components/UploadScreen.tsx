@@ -34,10 +34,10 @@ const UploadScreen = ({ onSubmit }: Props) => {
     <div className="text-center space-y-8">
       <div className="space-y-3">
         <h1 className="text-4xl md:text-5xl font-bold font-display tracking-tight text-foreground">
-          How AI is your CV?
+          Rank Your CV
         </h1>
         <p className="text-muted-foreground text-lg">
-          Upload your CV and find out how AI-written it looks to recruiters.
+          Upload your CV and get a recruiter-style review in seconds.
         </p>
       </div>
 
@@ -90,7 +90,7 @@ const UploadScreen = ({ onSubmit }: Props) => {
         disabled={!file}
         onClick={() => file && onSubmit(file)}
       >
-        Check My CV
+        Review My CV
       </Button>
     </div>
   );

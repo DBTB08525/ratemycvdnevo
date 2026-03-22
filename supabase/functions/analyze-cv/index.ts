@@ -8,26 +8,116 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are an experienced recruiter. Your job is to assess how AI-written a CV looks.
+const SYSTEM_PROMPT = `You are an experienced recruiter and CV reviewer. Your job is to give a thorough, fair, recruiter-style assessment of a CV.
 
-Analyse the CV text below and return a score from 0 to 100 representing how AI-generated it appears. 0 means it reads as entirely human-written. 100 means it reads as entirely AI-generated.
+Analyse the CV text below and score it across 9 categories, each out of 10. Then provide an overall weighted score out of 100.
 
-Look for:
-- Generic buzzwords and templated phrasing
-- Lack of specific numbers, outcomes, or real detail
-- Unnaturally consistent tone and structure throughout
-- Vague responsibility-led language instead of impact-led language
-- Over-polished, soulless writing with no personality
+Categories and weights:
+1. Structure & Layout (weight 10): clean logical layout, reverse chronological, no huge text blocks, clear sections, bullet points, readability
+2. Formatting & Consistency (weight 15): consistent spacing, bullet styles, date formatting, tense, alignment, no overlaps
+3. Professional Presentation (weight 5): professional fonts, sensible sizing, no distracting colours or unnecessary design
+4. Achievement Focus (weight 20): achievement-led not responsibility-led, evidence of impact, quantified results, outcomes
+5. Specificity & Strength of Language (weight 15): specific credible wording, strong action verbs, avoids vague phrases like "helped with" or "responsible for"
+6. Clarity & Conciseness (weight 10): no waffle, no clichés, no repetition, concise, easy to skim
+7. Keyword Use (weight 10): relevant keywords for likely market, not stuffed, balanced for humans and ATS
+8. Spelling, Grammar & Accuracy (weight 10): spelling, grammar, punctuation, consistency
+9. AI-Sounding Language (weight 5): overly polished/generic/templated language, buzzwords, empty corporate wording
 
-Do not accuse the candidate of lying. Frame everything as how it reads and comes across.
+Rules:
+- Do not assume the CV is bad
+- Do not over-penalise if metrics are impossible to quantify
+- If early-career, judge fairly in context
+- Only flag AI language when it genuinely sounds generic
+- Be practical and commercially realistic
+- Prioritise recruiter-readability over academic perfection
+- Be direct but helpful, professional, honest, not harsh
+
+Also provide:
+- A short verdict line (e.g. "Strong CV with a few areas to tighten up")
+- 3 top strengths (bullet points)
+- 3-5 main issues holding the CV back
+- 3-5 quick wins (practical fixes they can make immediately)
+- 2-4 rewrite examples turning weak phrasing into stronger achievement-led phrasing
 
 Return ONLY valid JSON, no preamble, no markdown:
 
 {
-  "ai_score": 0,
-  "summary": "",
-  "reasons": ["", "", ""],
-  "fixes": ["", "", ""]
+  "overallScore": 0,
+  "verdict": "",
+  "categoryScores": [
+    {
+      "name": "Structure & Layout",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Formatting & Consistency",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Professional Presentation",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Achievement Focus",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Specificity & Strength of Language",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Clarity & Conciseness",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Keyword Use",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "Spelling, Grammar & Accuracy",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    },
+    {
+      "name": "AI-Sounding Language",
+      "score": 0,
+      "summary": "",
+      "strengths": [""],
+      "improvements": [""]
+    }
+  ],
+  "topStrengths": ["", "", ""],
+  "mainIssues": ["", "", ""],
+  "quickWins": ["", "", ""],
+  "rewriteExamples": [
+    {
+      "weak": "",
+      "better": ""
+    }
+  ]
 }`;
 
 serve(async (req) => {
@@ -64,7 +154,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           error:
-            "We couldn't read that file. Please try a different PDF or Word doc.",
+            "We couldn't read enough text from this CV to review it properly.",
         }),
         {
           status: 400,
@@ -73,7 +163,6 @@ serve(async (req) => {
       );
     }
 
-    // Truncate to ~8000 chars to stay within limits
     if (text.length > 8000) text = text.substring(0, 8000);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -119,7 +208,6 @@ serve(async (req) => {
     const aiData = await aiResponse.json();
     let content = aiData.choices?.[0]?.message?.content || "";
 
-    // Strip markdown code fences if present
     content = content.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
 
     const parsed = JSON.parse(content);
@@ -132,7 +220,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error:
-          "We couldn't read that file. Please try a different PDF or Word doc.",
+          "Something went wrong while reviewing your CV. Please try again.",
       }),
       {
         status: 500,
