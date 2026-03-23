@@ -46,7 +46,7 @@ const UploadScreen = ({ onSubmit }: Props) => {
           Rate your CV
         </h1>
         <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-          Get a recruiter-style review across formatting, clarity, impact, and generic language in under a minute.
+          Get scored on formatting, consistency, clarity, impact, and generic language in under a minute.
         </p>
       </div>
 
