@@ -125,6 +125,7 @@ const UploadScreen = ({ onSubmit }: Props) => {
           ))}
         </ul>
       </div>
+    </div>
   );
 };
 
