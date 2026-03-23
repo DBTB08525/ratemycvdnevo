@@ -42,11 +42,11 @@ const UploadScreen = ({ onSubmit }: Props) => {
   return (
     <div className="text-center space-y-8">
       <div className="space-y-3">
-        <h1 className="text-4xl md:text-5xl font-bold font-display tracking-tight text-foreground">
-          See how your CV stacks up
+        <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight text-foreground">
+          Rate your CV
         </h1>
-        <p className="text-muted-foreground text-lg max-w-md mx-auto">
-          Upload your CV to get a recruiter-style review in seconds.
+        <p className="text-muted-foreground text-lg max-w-lg mx-auto">
+          Get a recruiter-style review across formatting, clarity, impact, and generic language in under a minute.
         </p>
       </div>
 
