@@ -158,6 +158,11 @@ const ResultsScreen = ({
         </Card>
       )}
 
+      {/* Trust Element */}
+      <p className="text-xs text-muted-foreground text-center">
+        This review is based on common recruiter checks including layout, clarity, consistency, impact, and generic language.
+      </p>
+
       <Button
         size="lg"
         variant="outline"

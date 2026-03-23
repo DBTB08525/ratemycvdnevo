@@ -126,27 +126,29 @@ serve(async (req) => {
   }
 
   try {
-    const { fileData, fileName, fileType } = await req.json();
+    const { fileData, fileName, fileType, rawText } = await req.json();
 
-    if (!fileData) {
-      return new Response(JSON.stringify({ error: "No file data provided" }), {
+    let text = "";
+
+    if (rawText) {
+      text = rawText;
+    } else if (fileData) {
+      const buffer = Uint8Array.from(atob(fileData), (c) => c.charCodeAt(0));
+      const isPdf =
+        fileType === "application/pdf" || fileName?.toLowerCase().endsWith(".pdf");
+
+      if (isPdf) {
+        const result = await pdfParse.default(buffer);
+        text = result.text;
+      } else {
+        const result = await mammoth.extractRawText({ buffer });
+        text = result.value;
+      }
+    } else {
+      return new Response(JSON.stringify({ error: "No CV data provided" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-    }
-
-    const buffer = Uint8Array.from(atob(fileData), (c) => c.charCodeAt(0));
-    let text = "";
-
-    const isPdf =
-      fileType === "application/pdf" || fileName?.toLowerCase().endsWith(".pdf");
-
-    if (isPdf) {
-      const result = await pdfParse.default(buffer);
-      text = result.text;
-    } else {
-      const result = await mammoth.extractRawText({ buffer });
-      text = result.value;
     }
 
     text = text.trim();
