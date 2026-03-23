@@ -106,25 +106,9 @@ const UploadScreen = ({ onSubmit }: Props) => {
         Upload CV
       </Button>
 
-      <div className="text-left space-y-3 pt-4 border-t border-border">
-        <p className="text-sm font-medium text-foreground">What your CV is scored on:</p>
-        <ul className="text-sm text-muted-foreground space-y-1.5">
-          {[
-            "Formatting",
-            "Consistency",
-            "Achievement-led content",
-            "Specificity",
-            "Readability",
-            "Generic / AI-style language",
-            "Overall recruiter impression",
-          ].map((item) => (
-            <li key={item} className="flex items-center gap-2">
-              <span className="w-1 h-1 rounded-full bg-muted-foreground/50 shrink-0" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <p className="text-xs text-muted-foreground/70 text-center">
+        Built around how recruiters actually review CVs
+      </p>
     </div>
   );
 };
