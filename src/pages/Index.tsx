@@ -59,9 +59,6 @@ const Index = () => {
     analyzeCV({ fileData: base64, fileName: file.name, fileType: file.type });
   };
 
-  const handleSubmitText = (text: string) => {
-    analyzeCV({ rawText: text });
-  };
 
   const handleReset = () => {
     setResult(null);
