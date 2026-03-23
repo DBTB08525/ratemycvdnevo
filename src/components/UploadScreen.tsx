@@ -42,11 +42,11 @@ const UploadScreen = ({ onSubmit }: Props) => {
   return (
     <div className="text-center space-y-8">
       <div className="space-y-3">
-        <h1 className="text-4xl md:text-5xl font-bold font-display tracking-tight text-foreground">
-          See how your CV stacks up
+        <h1 className="text-5xl md:text-6xl font-bold font-display tracking-tight text-foreground">
+          Rate your CV
         </h1>
-        <p className="text-muted-foreground text-lg max-w-md mx-auto">
-          Upload your CV to get a recruiter-style review in seconds.
+        <p className="text-muted-foreground text-lg max-w-lg mx-auto">
+          Get a recruiter-style review across formatting, clarity, impact, and generic language in under a minute.
         </p>
       </div>
 
@@ -105,6 +105,26 @@ const UploadScreen = ({ onSubmit }: Props) => {
       >
         Upload CV
       </Button>
+
+      <div className="text-left space-y-3 pt-4 border-t border-border">
+        <p className="text-sm font-medium text-foreground">What your CV is scored on:</p>
+        <ul className="text-sm text-muted-foreground space-y-1.5">
+          {[
+            "Formatting",
+            "Consistency",
+            "Achievement-led content",
+            "Specificity",
+            "Readability",
+            "Generic / AI-style language",
+            "Overall recruiter impression",
+          ].map((item) => (
+            <li key={item} className="flex items-center gap-2">
+              <span className="w-1 h-1 rounded-full bg-muted-foreground/50 shrink-0" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
