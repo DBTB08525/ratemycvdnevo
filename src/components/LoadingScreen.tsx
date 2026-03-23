@@ -25,7 +25,7 @@ const LoadingScreen = () => {
       <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
       <div className="space-y-2">
         <h2 className="text-2xl font-bold font-display text-foreground">
-          Reviewing your CV…
+          Reviewing your CV like a recruiter…
         </h2>
         <p className="text-muted-foreground transition-opacity duration-300">
           {messages[msgIndex]}
