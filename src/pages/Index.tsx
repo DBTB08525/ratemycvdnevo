@@ -68,9 +68,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-xl">
-        <div className="flex justify-center mb-8">
-          <img src={dnevoLogo} alt="Dnevo Partners" className="w-[120px]" />
-        </div>
+        {screen !== "results" && (
+          <div className="flex justify-center mb-8">
+            <img src={dnevoLogo} alt="Dnevo Partners" className="w-[120px]" />
+          </div>
+        )}
         {screen === "upload" && <UploadScreen onSubmit={handleSubmitFile} />}
         {screen === "loading" && <LoadingScreen />}
         {screen === "results" && result && (
