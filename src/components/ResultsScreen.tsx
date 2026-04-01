@@ -1,6 +1,10 @@
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, AlertCircle, Zap, ArrowRightLeft } from "lucide-react";
+import { CheckCircle2, AlertCircle, Zap, ArrowRightLeft, Download } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import dnevoLogo from "@/assets/dnevo-logo.png";
 
 interface CategoryScore {
   name: string;
