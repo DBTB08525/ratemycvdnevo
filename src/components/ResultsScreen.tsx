@@ -49,123 +49,196 @@ const ResultsScreen = ({
   result: AnalysisResult;
   onReset: () => void;
 }) => {
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    if (!resultsRef.current) return;
+    setDownloading(true);
+    try {
+      const canvas = await html2canvas(resultsRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
+
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const margin = 10;
+      const contentWidth = imgWidth - margin * 2;
+      const imgHeight = (canvas.height * contentWidth) / canvas.width;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let heightLeft = imgHeight;
+      let position = margin;
+
+      pdf.addImage(
+        canvas.toDataURL("image/jpeg", 0.95),
+        "JPEG",
+        margin,
+        position,
+        contentWidth,
+        imgHeight
+      );
+      heightLeft -= pageHeight - margin * 2;
+
+      while (heightLeft > 0) {
+        position = -(pageHeight - margin * 2) + margin + (imgHeight - heightLeft - (pageHeight - margin * 2));
+        pdf.addPage();
+        pdf.addImage(
+          canvas.toDataURL("image/jpeg", 0.95),
+          "JPEG",
+          margin,
+          margin - (imgHeight - heightLeft),
+          contentWidth,
+          imgHeight
+        );
+        heightLeft -= pageHeight - margin * 2;
+      }
+
+      pdf.save("cv-results.pdf");
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
-      {/* Overall Score */}
-      <div className="text-center space-y-3">
-        <h1
-          className={`text-6xl md:text-7xl font-bold font-display tracking-tight ${getScoreColor(
-            result.overallScore
-          )}`}
-        >
-          {result.overallScore}
-          <span className="text-3xl md:text-4xl text-muted-foreground font-normal">/100</span>
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-md mx-auto">
-          {result.verdict}
-        </p>
-      </div>
-
-      {/* Category Scores */}
-      <div className="space-y-3">
-        <h2 className="text-xl font-bold font-display text-foreground">Score Breakdown</h2>
-        <div className="space-y-3">
-          {result.categoryScores.map((cat, i) => (
-            <CategoryCard key={i} category={cat} />
-          ))}
+      <div ref={resultsRef} className="space-y-8">
+        {/* Logo */}
+        <div className="flex justify-center">
+          <img src={dnevoLogo} alt="Dnevo Partners" className="w-[120px]" />
         </div>
-      </div>
 
-      {/* Top Strengths */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-display">
-            <CheckCircle2 className="w-5 h-5 text-[hsl(var(--score-low))]" />
-            Top Strengths
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {result.topStrengths.map((s, i) => (
-              <li key={i} className="text-muted-foreground flex gap-2 text-sm">
-                <span className="text-foreground mt-0.5">•</span>
-                <span>{s}</span>
-              </li>
+        {/* Overall Score */}
+        <div className="text-center space-y-3">
+          <h1
+            className={`text-6xl md:text-7xl font-bold font-display tracking-tight ${getScoreColor(
+              result.overallScore
+            )}`}
+          >
+            {result.overallScore}
+            <span className="text-3xl md:text-4xl text-muted-foreground font-normal">/100</span>
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-md mx-auto">
+            {result.verdict}
+          </p>
+        </div>
+
+        {/* Category Scores */}
+        <div className="space-y-3">
+          <h2 className="text-xl font-bold font-display text-foreground">Score Breakdown</h2>
+          <div className="space-y-3">
+            {result.categoryScores.map((cat, i) => (
+              <CategoryCard key={i} category={cat} />
             ))}
-          </ul>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
 
-      {/* Main Issues */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-display">
-            <AlertCircle className="w-5 h-5 text-[hsl(var(--score-high))]" />
-            Main Issues
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {result.mainIssues.map((s, i) => (
-              <li key={i} className="text-muted-foreground flex gap-2 text-sm">
-                <span className="text-foreground mt-0.5">•</span>
-                <span>{s}</span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Quick Wins */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base font-display">
-            <Zap className="w-5 h-5 text-[hsl(var(--score-mid))]" />
-            Quick Wins
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {result.quickWins.map((s, i) => (
-              <li key={i} className="text-muted-foreground flex gap-2 text-sm">
-                <span className="text-foreground mt-0.5">•</span>
-                <span>{s}</span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Rewrite Examples */}
-      {result.rewriteExamples?.length > 0 && (
+        {/* Top Strengths */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base font-display">
-              <ArrowRightLeft className="w-5 h-5 text-primary" />
-              Stronger Rewrite Examples
+              <CheckCircle2 className="w-5 h-5 text-[hsl(var(--score-low))]" />
+              Top Strengths
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {result.rewriteExamples.map((ex, i) => (
-              <div key={i} className="space-y-2 text-sm">
-                <div className="bg-destructive/10 rounded-lg p-3">
-                  <span className="font-medium text-foreground">Weak: </span>
-                  <span className="text-muted-foreground">{ex.weak}</span>
-                </div>
-                <div className="bg-[hsl(var(--score-low))]/10 rounded-lg p-3">
-                  <span className="font-medium text-foreground">Better: </span>
-                  <span className="text-muted-foreground">{ex.better}</span>
-                </div>
-              </div>
-            ))}
+          <CardContent>
+            <ul className="space-y-2">
+              {result.topStrengths.map((s, i) => (
+                <li key={i} className="text-muted-foreground flex gap-2 text-sm">
+                  <span className="text-foreground mt-0.5">•</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
-      )}
 
-      {/* Trust Element */}
-      <p className="text-xs text-muted-foreground text-center">
-        This review is based on common recruiter checks including layout, clarity, consistency, impact, and generic language.
-      </p>
+        {/* Main Issues */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base font-display">
+              <AlertCircle className="w-5 h-5 text-[hsl(var(--score-high))]" />
+              Main Issues
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {result.mainIssues.map((s, i) => (
+                <li key={i} className="text-muted-foreground flex gap-2 text-sm">
+                  <span className="text-foreground mt-0.5">•</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Quick Wins */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base font-display">
+              <Zap className="w-5 h-5 text-[hsl(var(--score-mid))]" />
+              Quick Wins
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {result.quickWins.map((s, i) => (
+                <li key={i} className="text-muted-foreground flex gap-2 text-sm">
+                  <span className="text-foreground mt-0.5">•</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Rewrite Examples */}
+        {result.rewriteExamples?.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base font-display">
+                <ArrowRightLeft className="w-5 h-5 text-primary" />
+                Stronger Rewrite Examples
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {result.rewriteExamples.map((ex, i) => (
+                <div key={i} className="space-y-2 text-sm">
+                  <div className="bg-destructive/10 rounded-lg p-3">
+                    <span className="font-medium text-foreground">Weak: </span>
+                    <span className="text-muted-foreground">{ex.weak}</span>
+                  </div>
+                  <div className="bg-[hsl(var(--score-low))]/10 rounded-lg p-3">
+                    <span className="font-medium text-foreground">Better: </span>
+                    <span className="text-muted-foreground">{ex.better}</span>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Trust Element */}
+        <p className="text-xs text-muted-foreground text-center">
+          This review is based on common recruiter checks including layout, clarity, consistency, impact, and generic language.
+        </p>
+      </div>
+
+      <Button
+        size="lg"
+        className="w-full text-base h-12"
+        onClick={handleDownloadPDF}
+        disabled={downloading}
+      >
+        <Download className="w-5 h-5" />
+        {downloading ? "Generating PDF…" : "Download Results as PDF"}
+      </Button>
 
       <Button
         size="lg"
