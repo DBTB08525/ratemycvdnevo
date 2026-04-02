@@ -120,13 +120,20 @@ Return ONLY valid JSON, no preamble, no markdown:
   ]
 }`;
 
+/**
+ * PRIVACY: This function processes CV data entirely in memory.
+ * - No CV files, extracted text, or analysis results are stored in any database, storage bucket, or filesystem.
+ * - All data (file bytes, extracted text, AI response) is discarded when the request completes.
+ * - Each request is fully isolated — no shared state between users.
+ * - Do NOT log CV contents, extracted text, personal data, or analysis output.
+ */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { fileData, fileName, fileType, rawText } = await req.json();
+    const { fileData, fileName, fileType } = await req.json();
 
     let text = "";
 
