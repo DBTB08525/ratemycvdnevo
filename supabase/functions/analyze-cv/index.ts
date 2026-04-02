@@ -137,9 +137,7 @@ serve(async (req) => {
 
     let text = "";
 
-    if (rawText) {
-      text = rawText;
-    } else if (fileData) {
+    if (fileData) {
       const buffer = Uint8Array.from(atob(fileData), (c) => c.charCodeAt(0));
       const isPdf =
         fileType === "application/pdf" || fileName?.toLowerCase().endsWith(".pdf");
