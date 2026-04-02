@@ -194,8 +194,8 @@ serve(async (req) => {
     );
 
     if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error("AI error:", aiResponse.status, errText);
+      // PRIVACY: Do not log response body — it may echo CV content
+      console.error("AI request failed with status:", aiResponse.status);
 
       if (aiResponse.status === 429) {
         return new Response(
