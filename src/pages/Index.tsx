@@ -31,6 +31,13 @@ interface AnalysisResult {
 
 type Screen = "upload" | "loading" | "results";
 
+/**
+ * PRIVACY: All CV data is handled in-memory only.
+ * - The file is read as base64 via FileReader, sent to the edge function, and discarded.
+ * - Results are held in React state only — lost on refresh, navigation, or tab close.
+ * - No CV files, text, or results are saved to localStorage, sessionStorage, databases, or URLs.
+ * - Each browser session is fully isolated; concurrent users cannot access each other's data.
+ */
 const Index = () => {
   const [screen, setScreen] = useState<Screen>("upload");
   const [result, setResult] = useState<AnalysisResult | null>(null);

@@ -223,7 +223,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("Error:", e);
+    // PRIVACY: Log only error type, never CV content or extracted text
+    console.error("Processing error:", e instanceof Error ? e.message : "Unknown error");
     return new Response(
       JSON.stringify({
         error:
