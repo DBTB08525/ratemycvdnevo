@@ -120,19 +120,24 @@ Return ONLY valid JSON, no preamble, no markdown:
   ]
 }`;
 
+/**
+ * PRIVACY: This function processes CV data entirely in memory.
+ * - No CV files, extracted text, or analysis results are stored in any database, storage bucket, or filesystem.
+ * - All data (file bytes, extracted text, AI response) is discarded when the request completes.
+ * - Each request is fully isolated — no shared state between users.
+ * - Do NOT log CV contents, extracted text, personal data, or analysis output.
+ */
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { fileData, fileName, fileType, rawText } = await req.json();
+    const { fileData, fileName, fileType } = await req.json();
 
     let text = "";
 
-    if (rawText) {
-      text = rawText;
-    } else if (fileData) {
+    if (fileData) {
       const buffer = Uint8Array.from(atob(fileData), (c) => c.charCodeAt(0));
       const isPdf =
         fileType === "application/pdf" || fileName?.toLowerCase().endsWith(".pdf");
@@ -189,8 +194,8 @@ serve(async (req) => {
     );
 
     if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error("AI error:", aiResponse.status, errText);
+      // PRIVACY: Do not log response body — it may echo CV content
+      console.error("AI request failed with status:", aiResponse.status);
 
       if (aiResponse.status === 429) {
         return new Response(
@@ -218,7 +223,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("Error:", e);
+    // PRIVACY: Log only error type, never CV content or extracted text
+    console.error("Processing error:", e instanceof Error ? e.message : "Unknown error");
     return new Response(
       JSON.stringify({
         error:
