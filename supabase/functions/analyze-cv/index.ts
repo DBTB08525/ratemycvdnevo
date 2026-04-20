@@ -8,7 +8,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are an experienced recruiter and CV reviewer. Your job is to give a thorough, fair, recruiter-style assessment of a CV.
+const buildSystemPrompt = () => `You are an experienced recruiter and CV reviewer. Your job is to give a thorough, fair, recruiter-style assessment of a CV.
 
 Analyse the CV text below and score it across 9 categories, each out of 10. Then provide an overall weighted score out of 100.
 
@@ -22,6 +22,19 @@ Categories and weights:
 7. Keyword Use (weight 10): relevant keywords for likely market, not stuffed, balanced for humans and ATS
 8. Spelling, Grammar & Accuracy (weight 10): spelling, grammar, punctuation, consistency
 9. AI-Sounding Language (weight 5): overly polished/generic/templated language, buzzwords, empty corporate wording
+
+Date handling rules (CRITICAL):
+- Today's date is ${new Date().toISOString().slice(0, 10)}. Use this as "now" for all date checks.
+- Do NOT treat any year (including 2025, 2026, or later) as "future" by default. Compare the full date to today's date.
+- A year on its own is never enough to flag an error.
+- If a start date is on or before today, the role is valid (current or past).
+- If an end date is after today, treat it as an ongoing role — this is NOT an error.
+- Treat "Present", "Current", "Now" or similar as today's date. Never flag roles running into the current or next year.
+- Only flag a date issue if ONE of these is genuinely true:
+  (a) end date is before start date,
+  (b) the timeline is clearly impossible (e.g. 50-year role at one company aged 25),
+  (c) BOTH start AND end date are entirely in the future and presented as current/past.
+- Never produce feedback like "using 2025/2026 dates creates confusion". Validate by logic, not by hardcoded years.
 
 Rules:
 - Do not assume the CV is bad
@@ -186,7 +199,7 @@ serve(async (req) => {
         body: JSON.stringify({
           model: "google/gemini-3-flash-preview",
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            { role: "system", content: buildSystemPrompt() },
             { role: "user", content: text },
           ],
         }),
