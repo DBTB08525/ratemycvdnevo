@@ -16,7 +16,6 @@ import {
   ArrowRightLeft,
   Download,
   ShieldCheck,
-  Star,
   Clock,
   FileText,
 } from "lucide-react";
@@ -102,29 +101,6 @@ const steps = [
   },
 ];
 
-const testimonials = [
-  {
-    quote:
-      "I'd sent my CV out for weeks with no response. After fixing the issues Rate My CV flagged, I had two interviews booked within four days.",
-    name: "James R.",
-    role: "Marketing Manager",
-    stars: 5,
-  },
-  {
-    quote:
-      "We recommend this to every candidate we work with before submission. The impact scoring alone catches things that cost people jobs.",
-    name: "Sarah T.",
-    role: "Senior Recruiter, Financial Services",
-    stars: 5,
-  },
-  {
-    quote:
-      "The rewrite suggestions are genuinely useful, not generic advice. It showed me line by line where I was being vague.",
-    name: "Priya M.",
-    role: "Software Engineer",
-    stars: 5,
-  },
-];
 
 const stats = [
   { value: "10", label: "scored categories" },
@@ -187,7 +163,7 @@ export default function Landing() {
               className="mb-5 text-5xl font-bold leading-[1.1] tracking-tight text-slate-900 lg:text-6xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Get honest feedback on your CV in{" "}
+              Get a recruiter-level CV review in{" "}
               <span className="text-[hsl(220_90%_50%)]">60 seconds</span>
             </h1>
 
@@ -396,52 +372,6 @@ export default function Landing() {
               <ShieldCheck className="h-4 w-4 text-slate-400" />
               PDF, .doc, and .docx supported
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Social proof ──────────────────────────────────────── */}
-      <section className="bg-slate-50 px-6 py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
-            <h2
-              className="mb-3 text-3xl font-bold text-slate-900"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              What candidates and recruiters say
-            </h2>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map(({ quote, name, role, stars }) => (
-              <Card
-                key={name}
-                className="border-slate-200 bg-white shadow-sm"
-              >
-                <CardContent className="p-6">
-                  <div className="mb-4 flex gap-0.5">
-                    {Array.from({ length: stars }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className="h-4 w-4 fill-amber-400 text-amber-400"
-                      />
-                    ))}
-                  </div>
-                  <p className="mb-5 text-sm leading-relaxed text-slate-600">
-                    "{quote}"
-                  </p>
-                  <div>
-                    <p
-                      className="font-semibold text-slate-900"
-                      style={{ fontFamily: "var(--font-display)" }}
-                    >
-                      {name}
-                    </p>
-                    <p className="text-xs text-slate-400">{role}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
