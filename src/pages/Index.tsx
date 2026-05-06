@@ -92,7 +92,7 @@ const Index = () => {
       {screen !== "results" && (
         <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <img src={dnevoLogo} alt="Dnevo Partners" className="h-7 w-auto" />
+            <img src={dnevoLogo} alt="Dnevo Partners" className="h-10 w-auto" />
             <a
               href="/"
               className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-700 transition-colors"

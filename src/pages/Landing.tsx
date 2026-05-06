@@ -122,7 +122,7 @@ export default function Landing() {
             <img
               src={dnevoLogo}
               alt="Dnevo Partners"
-              className="h-7 w-auto"
+              className="h-10 w-auto"
             />
           </div>
           <Button
@@ -437,7 +437,7 @@ export default function Landing() {
             <img
               src={dnevoLogo}
               alt="Dnevo Partners"
-              className="h-6 w-auto opacity-60"
+              className="h-7 w-auto opacity-60"
             />
             <span className="text-sm text-slate-400">
               © {new Date().getFullYear()} Dnevo Partners
