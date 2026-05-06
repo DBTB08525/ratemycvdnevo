@@ -46,9 +46,24 @@ const Index = () => {
   const analyzeCV = async (body: Record<string, string>) => {
     setScreen("loading");
     try {
-      const { data, error } = await supabase.functions.invoke("analyze-cv", { body });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      let data;
+
+      if (import.meta.env.DEV) {
+        const res = await fetch("/api/analyze-cv", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Local analysis failed");
+        data = json;
+      } else {
+        const { data: fnData, error } = await supabase.functions.invoke("analyze-cv", { body });
+        if (error) throw error;
+        if (fnData?.error) throw new Error(fnData.error);
+        data = fnData;
+      }
+
       setResult(data);
       setScreen("results");
     } catch (e: any) {
@@ -73,18 +88,28 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-xl">
-        {screen !== "results" && (
-          <div className="flex justify-center mb-8">
-            <img src={dnevoLogo} alt="Dnevo Partners" className="w-[120px]" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/40">
+      {screen !== "results" && (
+        <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <img src={dnevoLogo} alt="Dnevo Partners" className="h-7 w-auto" />
+            <a
+              href="/"
+              className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-700 transition-colors"
+            >
+              ← Back
+            </a>
           </div>
-        )}
-        {screen === "upload" && <UploadScreen onSubmit={handleSubmitFile} />}
-        {screen === "loading" && <LoadingScreen />}
-        {screen === "results" && result && (
-          <ResultsScreen result={result} onReset={handleReset} />
-        )}
+        </header>
+      )}
+      <div className="flex min-h-[calc(100vh-61px)] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-lg">
+          {screen === "upload" && <UploadScreen onSubmit={handleSubmitFile} />}
+          {screen === "loading" && <LoadingScreen />}
+          {screen === "results" && result && (
+            <ResultsScreen result={result} onReset={handleReset} />
+          )}
+        </div>
       </div>
     </div>
   );
